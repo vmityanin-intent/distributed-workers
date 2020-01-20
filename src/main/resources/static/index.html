@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+
+            $("#startJob").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/api/v1/submit",
+                    data: "{}",
+                    contentType: 'application/json',
+                    error: function (error) {
+                        clearInterval(interval);
+                    }
+                });
+
+                let startTime = new Date().getTime();
+
+                let interval = setInterval(function () {
+                    $.ajax({
+                        url: "/api/v1/status",
+                        success: function (result) {
+                            if (startTime + 5000 < new Date().getTime() && result.length == 0) {
+                                clearInterval(interval);
+                            }
+                            $("#div1").html(result.length != 0 ? JSON.stringify(result) : "");
+                        }, error: function (error) {
+                            clearInterval(interval);
+                        }
+                    });
+                }, 1000);
+            });
+
+        });
+    </script>
+</head>
+<body>
+<h2>Jobs</h2>
+<div id="div1"><h2></h2></div>
+
+<button id="startJob">Start Job</button>
+</body>
+</html>
